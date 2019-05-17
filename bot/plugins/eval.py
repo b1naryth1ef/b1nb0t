@@ -1,6 +1,8 @@
 import pprint
 
+
 from disco.bot import Plugin, CommandLevels
+from bot.util.args import parse_message_arg
 
 PY_CODE_BLOCK = '```py\n{}\n```'
 
@@ -43,3 +45,12 @@ class EvalPlugin(Plugin):
                 return
 
             event.msg.reply(PY_CODE_BLOCK.format(pprint.pformat(local['x'])))
+
+    @Plugin.command('source', '<message_raw:str>', level=CommandLevels.ADMIN)
+    def command_source(self, event, message_raw):
+        channel_id, message_id = parse_message_arg(event.channel.id, message_raw)
+        message = self.state.channels.get(channel_id).get_message(message_id)
+
+        event.msg.reply('```{}```'.format(
+            pprint.pformat(message.to_dict())
+        ))
